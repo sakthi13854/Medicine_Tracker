@@ -1,17 +1,20 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import AsyncSession
+
+from sqlalchemy.ext.asyncio import AsyncSession,create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+import asyncio
 
+Database_Url =  "sqlite+aiosqlite:///./medicine-tracker.db"
 
-Database_Url = "sqlite:///medicine-tracker.db"
-engine = create_engine(Database_Url,connect_args={'check_same_thread': False})
+engine = create_async_engine(Database_Url,echo=True)
 
 sessionLocal = sessionmaker( bind=engine,
                              class_=AsyncSession,
                              expire_on_commit=False)
 Base = declarative_base()
 
-async def get_db():
-    async with engine.begin() as conn:
-        yield conn
+async def get_db() -> sessionLocal:
+    async with sessionLocal() as session:
+        yield session
+
+
