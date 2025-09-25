@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.Authentication import signup
+from src.Routes import signup , Medicine_routes
 from src.database import Base, engine
 import asyncio
 app = FastAPI()
@@ -7,6 +7,8 @@ app = FastAPI()
 
 app.include_router(signup.router)
 app.include_router(signup.loginrouter)
+
+app.include_router(Medicine_routes.router)
 @app.on_event("startup")
 async def init_db():
     async with engine.begin() as conn:

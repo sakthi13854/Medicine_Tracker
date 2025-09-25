@@ -1,9 +1,6 @@
-from fastapi import HTTPException,Depends
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-
-from src import database
-from src.database import get_db
 from src.models.users import User
 from src.Schemas.Users_schema import UsersCreate, UsersCheck
 from sqlalchemy.exc import IntegrityError
