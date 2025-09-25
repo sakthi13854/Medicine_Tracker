@@ -11,3 +11,10 @@ class UsersCreate(BaseModel):
         from_attributes = True
 class UsersUpdate(BaseModel):
     name : str
+    id : int
+    age : int
+    email : str
+
+class UsersCheck(BaseModel):
+    email : str
+    password : str

@@ -6,6 +6,7 @@ app = FastAPI()
 
 
 app.include_router(signup.router)
+app.include_router(signup.loginrouter)
 @app.on_event("startup")
 async def init_db():
     async with engine.begin() as conn:

@@ -1,6 +1,8 @@
-medicine-tracker.db
+
 # Ignore Python virtual environment
 .venv/
 
 # Ignore SQLite database
 *.db
+__pycache__/
+*.py[cod]
