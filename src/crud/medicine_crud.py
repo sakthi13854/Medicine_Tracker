@@ -17,7 +17,10 @@ async def add_medicines(db: AsyncSession, medicine : AddMedicine):
         UserId=medicine.UserId,
         dosage=medicine.dosage,
         routine=medicine.routine,
+        start_date=medicine.start_date,
+        end_date=medicine.end_date,
         expiry_date=medicine.expiry_date,
+        Type=medicine.Type,
     )
     db.add(new_medicine)
     try:

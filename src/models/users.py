@@ -1,4 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date, ForeignKey
+from sqlalchemy.orm import relationship
+
 from src.database import Base
 
 class User(Base):
@@ -16,4 +18,8 @@ class Medicine(Base):
     MedicineName = Column(String,nullable=False)
     dosage = Column(String,nullable=False)
     routine = Column(String,nullable=False)
+    start_date = Column(Date,nullable=False)
+    end_date = Column(Date,nullable=False)
     expiry_date = Column(Date,nullable=False)
+    Type = Column(String,nullable=False)
+
