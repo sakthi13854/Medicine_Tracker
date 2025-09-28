@@ -2,11 +2,12 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from src.models.Scheduler import Scheduler
-from src.scheduler_services.Scheduler_schema import  AddSchedule
+from src.scheduler_services.Scheduler_schema import AddSchedule, Today_Medicine
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import and_
 from datetime import date
 from src.models.users import Medicine
+from typing import List
 
 async def Add_Schedule(db: AsyncSession, schedule : AddSchedule):
 
@@ -29,7 +30,7 @@ async def Add_Schedule(db: AsyncSession, schedule : AddSchedule):
 
 today = date.today()
 weekday = today.strftime("%A")
-async def today_medicine(db: AsyncSession):
+async def today_medicine(db: AsyncSession,user_id:int)->List[Today_Medicine]:
     today = date.today()
     weekday = today.strftime("%A")
     result = await db.execute(
@@ -37,6 +38,7 @@ async def today_medicine(db: AsyncSession):
         join(Medicine,Scheduler.Medicine_id==Medicine.id)
         .where(
             and_(
+                Medicine.UserId==user_id,
                 Medicine.start_date <= today,
                 Medicine.end_date >= today,
                 Scheduler.Day_of_week == weekday
@@ -45,6 +47,20 @@ async def today_medicine(db: AsyncSession):
     )
     Medicines = result.all()
     try:
-        return Medicine
+        if not Medicines:
+            raise HTTPException(status_code=404, detail="Medicine not found")
+        response = []
+        for med, sched in Medicines:
+            response.append(
+                Today_Medicine(
+                    medicine_id=med.id,
+                    MedicineName=med.MedicineName,
+                    dosage=med.dosage,
+                    reminder_type=sched.reminder_type,
+                    success=True,
+                    message="Medicine scheduled for today"
+                )
+            )
+        return response
     except IntegrityError:
-        raise HTTPException(status_code=400, detail="You Have no Medicine Today")
+        raise HTTPException(status_code=400, detail="Something went wrong")

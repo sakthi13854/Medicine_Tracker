@@ -39,8 +39,10 @@ class Today_Medicine(BaseModel):
     MedicineName :str
     dosage : str
     reminder_type : str
+    success : bool
+    message: str
     class Config:
-        from_attributes= True
+        orm_mode= True
 
 
 
