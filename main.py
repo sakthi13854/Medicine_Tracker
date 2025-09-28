@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.Routes import signup , Medicine_routes,schedule_routes
+from src.Routes import signup , Medicine_routes,schedule_routes,adherence_routes
 from src.database import Base, engine
 import asyncio
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +18,7 @@ app.include_router(signup.loginrouter)
 
 app.include_router(Medicine_routes.router)
 app.include_router(schedule_routes.router)
+app.include_router(adherence_routes.router)
 @app.on_event("startup")
 async def init_db():
     async with engine.begin() as conn:

@@ -1,0 +1,12 @@
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from src import database
+from src.Adherecnce_logs.adherence_schema import AdherenceLogs,AdherenceLogsResponse
+from src.Adherecnce_logs.adherence_crud import adherence_log
+
+router = APIRouter(prefix="/Adherence", tags=["Adherence"])
+
+@router.post("/", response_model=AdherenceLogsResponse)
+async def adherence_add(adherencelog: AdherenceLogs ,db: AsyncSession = Depends(database.get_db)):
+    result = await adherence_log(db , adherencelog)
+    return result
