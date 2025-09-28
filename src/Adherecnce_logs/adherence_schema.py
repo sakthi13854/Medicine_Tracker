@@ -24,3 +24,8 @@ class AdherenceLogsResponse(BaseModel):
     data : Optional[AdherenceLogs]
     class Config:
         from_attributes = True
+class AdherencePredictionInput(BaseModel):
+    hour: int
+    day_of_week: int
+    medicine_id: int
+    past_adherence_rate: float
