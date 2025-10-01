@@ -1,3 +1,4 @@
+
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.adherence import Adherence
@@ -5,10 +6,24 @@ from src.Adherecnce_logs.adherence_schema import AdherenceLogs,AdherenceLogsResp
 from sqlalchemy.exc import IntegrityError
 import numpy as np
 import joblib
+from sqlalchemy.future import select
+from sqlalchemy.sql import func
+from datetime import datetime
 
-async def adherence_log(db : AsyncSession,adherence : AdherenceLogs ):
+def dosage_to_numeric(dosage_str):
+    dosage_str = dosage_str.lower().replace(" ", "")
+    if "tablet" in dosage_str or "capsule" in dosage_str:
+        return float(dosage_str.replace("tablet","").replace("capsule","") or 1)
+    elif "mg" in dosage_str:
+        return float(dosage_str.replace("mg",""))
+    elif "ml" in dosage_str:
+        return float(dosage_str.replace("ml",""))
+    else:
+        return 0
+
+async def adherence_log(db : AsyncSession,adherence : AdherenceLogs,user_id :int ):
     log = Adherence(
-        Userid=adherence.Userid,
+        Userid=user_id,
         MedicineId = adherence.MedicineId,
         ScheduledTime = adherence.ScheduledTime,
         AdherenceTime = adherence.AdherenceTime,
@@ -19,19 +34,42 @@ async def adherence_log(db : AsyncSession,adherence : AdherenceLogs ):
     try :
         await db.commit()
         await db.refresh(log)
-        model = joblib.load('src/Ml/adherence_model.pkl')
-        scaler = joblib.load('src/Ml/scaler.pkl')
+        Model_path = 'src/Ml/adherence_model2.pkl'
+        scaler_path = 'src/Ml/scaler (1).pkl'
+
+        model = joblib.load(Model_path)
+        scaler = joblib.load(scaler_path)
 
 
         hour = adherence.ScheduledTime.hour
         day_of_week = adherence.ScheduledTime.weekday()
         medicine_id = adherence.MedicineId
-        past_rate = 0.8
-        dosage_map = {"1tablet": 1, "2tablets": 2, "10mg": 10, "20mg": 20}
-        dosage_numeric = dosage_map.get(adherence.dosage, 0)
+        status = adherence.status
+        status_map = {"taken": 1, "missed": 0}
+        status_numeric = status_map.get(status.lower(), 0)
+        is_weekend = 0
+        if day_of_week == 5 or day_of_week == 6:
+            is_weekend = 1
+        dosage_numeric = dosage_to_numeric(adherence.dosage)
+        query = await db.execute(
+            select(
+                func.sum(Adherence.dosage).label("taken"),
+                func.count(Adherence.id).label("scheduled")
+            ).where(
+                Adherence.Userid == adherence.Userid,
+                Adherence.MedicineId == adherence.MedicineId
+            )
+        )
+        result = query.first()
+        taken = result.taken or 0
+        scheduled = result.scheduled or 1
+        past_rate = taken / scheduled
+        feature8 = 0
+        feature9 = 0
+        feature10 = 0
 
 
-        X_new = np.array([[adherence.Userid, medicine_id, hour, day_of_week, dosage_numeric]])
+        X_new = np.array([[  hour, day_of_week, is_weekend,medicine_id, dosage_numeric,past_rate,status_numeric,feature8,feature9,feature10],])
         X_scaled = scaler.transform(X_new)
         missed_prob = float(model.predict_proba(X_scaled)[0, 1])
 

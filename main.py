@@ -3,6 +3,8 @@ from src.Routes import signup , Medicine_routes,schedule_routes,adherence_routes
 from src.database import Base, engine
 import asyncio
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+import os
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -14,7 +16,7 @@ app.add_middleware(
 
 
 app.include_router(signup.router)
-app.include_router(signup.loginrouter)
+
 
 app.include_router(Medicine_routes.router)
 app.include_router(schedule_routes.router)

@@ -12,8 +12,8 @@ router = APIRouter(
 )
 
 @router.post("/add_schedule", response_model=SchedulerResponse)
-async def add_schedule(schedule: AddSchedule,db: AsyncSession = Depends(database.get_db)):
-    result = await Add_Schedule(db, schedule)
+async def add_schedule(user_id:int,schedule: AddSchedule,db: AsyncSession = Depends(database.get_db)):
+    result = await Add_Schedule(db, schedule, user_id)
     return result
 @router.get("/Today_Medicine", response_model=List[Today_Medicine])
 async def get_schedule(user_id: int = Query(..., title="User ID", description="ID of the logged-in user")

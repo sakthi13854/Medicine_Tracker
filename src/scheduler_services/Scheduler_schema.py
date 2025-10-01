@@ -15,7 +15,7 @@ class AddSchedule(BaseModel):
     Medicine_id: int
     time_of_data :time
     Day_of_week :str
-    dosage :str
+    Total_dosage_today :str
     reminder_type :str
 
 
@@ -25,7 +25,7 @@ class SchedulerResponse(BaseModel):
     Medicine_id: int
     time_of_data: time
     Day_of_week: str
-    dosage: str
+    Total_dosage_today: str
     reminder_type: Type = Type.normal
     created_at: Optional[
         datetime

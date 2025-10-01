@@ -8,7 +8,7 @@ class Scheduler(Base):
     Medicine_id = Column(Integer, ForeignKey('medicines.id'),nullable=False)
     time_of_data = Column(Time,nullable=False)
     Day_of_week = Column(String,nullable=False)
-    dosage = Column(String,nullable=False)
+    Total_dosage_today = Column(String,nullable=False)
     reminder_type = Column(String,nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

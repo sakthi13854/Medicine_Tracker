@@ -30,6 +30,14 @@ class MyMedicines(BaseModel):
     routine : str
     expiry_date : date
     type : MType = MType.Tablet
+    class Config:
+        from_attributes = True
+
+class MyMedicinesResponse(BaseModel):
+    success : bool
+    message: str
+    data : Optional[List[MyMedicines]] = None
+
 
 class ExpiryMedicinesResponse(BaseModel):
     id : int
@@ -37,7 +45,7 @@ class ExpiryMedicinesResponse(BaseModel):
     expiry_date : date
     class Config:
         from_attributes = True
-class ResponseModel(BaseModel):
+class ExResponseModel(BaseModel):
     success: bool
     message: str
     data: Optional[List[ExpiryMedicinesResponse]] = None

@@ -10,10 +10,10 @@ class UsersCreate(BaseModel):
     class Config:
         from_attributes = True
 class UsersUpdate(BaseModel):
-    name : str
+    success : bool
+    message: str
     id : int
-    age : int
-    email : str
+
 
 class UsersCheck(BaseModel):
     email : str

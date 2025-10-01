@@ -4,11 +4,11 @@ from src.database import Base
 from sqlalchemy.sql import func
 
 class Adherence(Base):
-    __tablename__ = 'adherence_logs',
+    __tablename__ = "adherence_logs"
     id = Column(Integer, primary_key=True,index=True)
     Userid = Column(Integer, ForeignKey('users.id'))
     MedicineId = Column(Integer, ForeignKey('medicines.id'))
     ScheduledTime = Column(DateTime,nullable=False)
     AdherenceTime = Column(DateTime(timezone=True), server_default=func.now())
     status = Column(String,nullable=False)
-    dosage = Column(String,ForeignKey('scheduler.dosage'))
+    dosage = Column(String,ForeignKey('scheduler.Total_dosage_today'))
