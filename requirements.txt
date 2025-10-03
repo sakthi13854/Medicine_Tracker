@@ -7,3 +7,5 @@ uvicorn[standard]
 aiosqlite
 scikit-learn
 pandas
+asyncpg
+psycopg2-binary

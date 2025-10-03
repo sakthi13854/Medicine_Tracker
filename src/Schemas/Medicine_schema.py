@@ -11,7 +11,6 @@ class MType(str, Enum):
     Syrup="Syrup"
 
 class AddMedicine(BaseModel):
-    UserId :int
     MedicineName : str
     dosage :str
     routine : str

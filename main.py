@@ -1,9 +1,7 @@
 from fastapi import FastAPI
 from src.Routes import signup , Medicine_routes,schedule_routes,adherence_routes
 from src.database import Base, engine
-import asyncio
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import text
 import os
 app = FastAPI()
 app.add_middleware(
@@ -27,4 +25,5 @@ async def init_db():
         await conn.run_sync(Base.metadata.create_all)
     print("Database initialized successfully!")
 if __name__ == "__main__":
-    asyncio.run(init_db())
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), reload=True)

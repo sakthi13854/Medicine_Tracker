@@ -80,7 +80,7 @@ async def expiry_medicines(db: AsyncSession, user_id : int):
     ]
     try:
         if not medicines:
-            raise HTTPException(status_code=404,detail="You have no medicines. Please add medicines first")
+            raise HTTPException(status_code=404,detail="You have no medicines that is expired")
         return ExResponseModel(
             success=True,
             message="Medicines expired,Please consider the following medicines",

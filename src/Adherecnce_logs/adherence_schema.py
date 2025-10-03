@@ -9,7 +9,6 @@ class Status(str, Enum):
     skipped = "skipped"
 
 class AdherenceLogs(BaseModel):
-    Userid : int
     MedicineId :int
     ScheduledTime : datetime
     AdherenceTime : Optional[datetime]

@@ -8,7 +8,7 @@ import numpy as np
 import joblib
 from sqlalchemy.future import select
 from sqlalchemy.sql import func
-from datetime import datetime
+from sqlalchemy import cast, Float
 
 def dosage_to_numeric(dosage_str):
     dosage_str = dosage_str.lower().replace(" ", "")
@@ -28,7 +28,7 @@ async def adherence_log(db : AsyncSession,adherence : AdherenceLogs,user_id :int
         ScheduledTime = adherence.ScheduledTime,
         AdherenceTime = adherence.AdherenceTime,
         status =adherence.status,
-        dosage = adherence.dosage,
+        dosage = dosage_to_numeric(adherence.dosage)
     )
     db.add(log)
     try :
@@ -53,17 +53,20 @@ async def adherence_log(db : AsyncSession,adherence : AdherenceLogs,user_id :int
         dosage_numeric = dosage_to_numeric(adherence.dosage)
         query = await db.execute(
             select(
-                func.sum(Adherence.dosage).label("taken"),
+                func.sum(cast(Adherence.dosage, Float)).label("taken"),
                 func.count(Adherence.id).label("scheduled")
             ).where(
-                Adherence.Userid == adherence.Userid,
+                Adherence.Userid == user_id,
                 Adherence.MedicineId == adherence.MedicineId
             )
         )
         result = query.first()
         taken = result.taken or 0
         scheduled = result.scheduled or 1
-        past_rate = taken / scheduled
+        if scheduled == 1:
+            past_rate = 0.5  # neutral for new users
+        else:
+            past_rate = taken / scheduled
         feature8 = 0
         feature9 = 0
         feature10 = 0
@@ -76,9 +79,9 @@ async def adherence_log(db : AsyncSession,adherence : AdherenceLogs,user_id :int
         if missed_prob < 0.3:
             reminder_type = "normal"
         elif missed_prob < 0.7:
-            reminder_type = "priority"
-        else:
             reminder_type = "extra"
+        else:
+            reminder_type = "priority"
 
         return AdherenceLogsResponse(success=True,
                                      message=f"Adherence Log Created. Reminder Type: {reminder_type}, Missed Probability: {missed_prob:.2f}",
