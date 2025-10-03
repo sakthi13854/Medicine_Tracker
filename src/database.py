@@ -9,7 +9,7 @@ Database_Url =os.environ.get("DATABASE_URL")
 if not Database_Url:
     raise ValueError("DATABASE_URL environment variable not set!")
 ssl_context = ssl.create_default_context()
-ssl_context.verify_mode = ssl.CERT_REQUIRED
+ssl_context.verify_mode = ssl.CERT_NONE
 engine = create_async_engine(
     Database_Url,
     echo=True,
