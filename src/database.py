@@ -5,10 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 import asyncio
 import os
 
-Database_Url =os.getenv(
-    "DATABASE_URL",
-    "postgresql+asyncpg://postgres:9625015@localhost:5432/medicine_tracker"
-)
+Database_Url =os.environ.get("DATABASE_URL")
 
 engine = create_async_engine(Database_Url,echo=True)
 
