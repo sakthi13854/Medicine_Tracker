@@ -34,8 +34,8 @@ async def adherence_log(db : AsyncSession,adherence : AdherenceLogs,user_id :int
     try :
         await db.commit()
         await db.refresh(log)
-        Model_path = 'src/Ml/adherence_model2.pkl'
-        scaler_path = 'src/Ml/scaler (1).pkl'
+        Model_path = 'src/Ml/adherence_model2 (1).pkl'
+        scaler_path = 'src/Ml/scaler (2).pkl'
 
         model = joblib.load(Model_path)
         scaler = joblib.load(scaler_path)
