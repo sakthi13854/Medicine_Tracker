@@ -2,11 +2,25 @@
 # Ignore Python virtual environment
 .venv/
 
-# Ignore SQLite database
-*.db
-___pycache__/
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
 
+# Database files
+src/database.py
+database.py
+
+# SQLite databases (optional)
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables
+.env
+.env.local
+
+# Virtual environment
+venv/
+env/
