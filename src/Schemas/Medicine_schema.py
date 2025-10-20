@@ -49,4 +49,19 @@ class ExResponseModel(BaseModel):
     message: str
     data: Optional[List[ExpiryMedicinesResponse]] = None
 
+class updatemedicine(BaseModel):
+    MedicineName : str
+    dosage :str
+    routine : str
+    expiry_date : date
+    start_date : date
+    end_date : date
+    Type : MType = MType.Tablet
+
+class deletemedicine(BaseModel):
+    MedicineName : str
+    class config:
+        from_attributes = True
+
+
 

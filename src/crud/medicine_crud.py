@@ -2,11 +2,12 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from src.models.users import Medicine
-from src.Schemas.Medicine_schema import AddMedicine, ExResponseModel, ExpiryMedicinesResponse,MyMedicinesResponse,MyMedicines
+from src.Schemas.Medicine_schema import AddMedicine, ExResponseModel, ExpiryMedicinesResponse,MyMedicinesResponse,MyMedicines,updatemedicine
 from sqlalchemy.exc import IntegrityError
 from datetime import date
 from sqlalchemy import and_
-async def add_medicines(db: AsyncSession, medicine : AddMedicine,user_id:int):
+
+async def add_medicines(db: AsyncSession, medicine : AddMedicine , user_id : int):
     result = await db.execute(
         select(Medicine).where(Medicine.MedicineName == medicine.MedicineName , Medicine.UserId == user_id)
     )
@@ -88,3 +89,54 @@ async def expiry_medicines(db: AsyncSession, user_id : int):
         )
     except IntegrityError:
         raise HTTPException(status_code=400, detail="Sorry medicine could not be added")
+
+async def get_medid(db :AsyncSession, medicinename : str, userid: int ):
+    result =  await db.execute(
+        select(Medicine.id).where(Medicine.MedicineName == medicinename, Medicine.UserId == userid)
+    )
+    medid = result.scalar()
+
+    return medid if medid else None
+
+
+async def edit_medicine(db : AsyncSession,medicine : updatemedicine , user_id :int):
+    medid = await get_medid(db = db ,medicinename = medicine.MedicineName, userid = user_id )
+    print(medid)
+    result = await db.execute(
+        select(Medicine).where(Medicine.id == medid)
+    )
+    user_exist = result.scalar_one_or_none()
+    try:
+        if user_exist:
+            update_data = medicine.model_dump(exclude_unset=True)
+
+            for key, value in update_data.items():
+                setattr(user_exist, key, value)
+
+            await db.commit()
+            await db.refresh(user_exist)
+            return {'success' : True ,
+                       'message':'changes added successfully' }
+        else:
+            raise HTTPException(status_code = 404 , detail = "You have no medicine to change.please add medicinec first")
+    except IntegrityError:
+        raise HTTPException(status_code = 400,deatil = "internal server error")
+async def del_medicine(db : AsyncSession,medicine : updatemedicine , user_id :int):
+    medid = await get_medid(db = db ,medicinename = medicine.MedicineName, userid = user_id )
+    print(medid)
+    result = await db.execute(
+        select(Medicine).where(Medicine.id == medid)
+    )
+    user_exist = result.scalar_one_or_none()
+    try:
+        if user_exist:
+            await db.delete(user_exist)
+            await db.commit()
+            return {'success' : True ,
+                       'message':' deleted successfully' }
+        else:
+            raise HTTPException(status_code = 404 , detail = "You have no medicine to change.please add medicinec first")
+    except IntegrityError:
+        raise HTTPException(status_code = 400,deatil = "internal server error")
+
+       
