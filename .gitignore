@@ -4,5 +4,9 @@
 
 # Ignore SQLite database
 *.db
-__pycache__/
-*.py[cod]
+___pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
