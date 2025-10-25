@@ -24,3 +24,4 @@ database.py
 # Virtual environment
 venv/
 env/
+.venv
