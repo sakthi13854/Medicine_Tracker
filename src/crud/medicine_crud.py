@@ -2,10 +2,11 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from src.models.users import Medicine
-from src.Schemas.Medicine_schema import AddMedicine, ExResponseModel, ExpiryMedicinesResponse,MyMedicinesResponse,MyMedicines,updatemedicine
+from src.Schemas.Medicine_schema import AddMedicine, ExResponseModel, ExpiryMedicinesResponse,MyMedicinesResponse,MyMedicines,updatemedicine, deletemedicine
 from sqlalchemy.exc import IntegrityError
 from datetime import date
 from sqlalchemy import and_
+from typing import List
 
 async def add_medicines(db: AsyncSession, medicine : AddMedicine , user_id : int):
     result = await db.execute(
@@ -99,7 +100,7 @@ async def get_medid(db :AsyncSession, medicinename : str, userid: int ):
     return medid if medid else None
 
 
-async def edit_medicine(db : AsyncSession,medicine : updatemedicine , user_id :int):
+async def edit_medicine(db : AsyncSession,medicine : deletemedicine , user_id :int):
     medid = await get_medid(db = db ,medicinename = medicine.MedicineName, userid = user_id )
     print(medid)
     result = await db.execute(
@@ -121,6 +122,8 @@ async def edit_medicine(db : AsyncSession,medicine : updatemedicine , user_id :i
             raise HTTPException(status_code = 404 , detail = "You have no medicine to change.please add medicinec first")
     except IntegrityError:
         raise HTTPException(status_code = 400,deatil = "internal server error")
+
+        
 async def del_medicine(db : AsyncSession,medicine : updatemedicine , user_id :int):
     medid = await get_medid(db = db ,medicinename = medicine.MedicineName, userid = user_id )
     print(medid)
@@ -138,5 +141,40 @@ async def del_medicine(db : AsyncSession,medicine : updatemedicine , user_id :in
             raise HTTPException(status_code = 404 , detail = "You have no medicine to change.please add medicinec first")
     except IntegrityError:
         raise HTTPException(status_code = 400,deatil = "internal server error")
+
+async def today_medicine(db: AsyncSession,user_id : int,tdate : date ):
+    today = date.today()
+    weekday = today.strftime("%A")
+    result = await db.execute(
+        select(Medicine)
+        .where(
+            Medicine.UserId==user_id,
+            Medicine.start_date <= today,
+            Medicine.end_date >= today,
+            tdate == today
+       )
+    )
+    Medicines = result.scalars().all()
+    try:
+        if not Medicines:
+            raise HTTPException(status_code=404, detail="You dont have any medicine today or add medicine first")
+        medicines_list = [
+        MyMedicines(
+            id=med.id,
+            MedicineName=med.MedicineName,
+            dosage=med.dosage,
+            routine=med.routine,
+            expiry_date=med.expiry_date,
+            type=med.Type
+        )
+        for med in Medicines]
+        return MyMedicinesResponse(
+            success = True,
+            message="you have the following medicines:",
+            data=medicines_list
+        )
+    except IntegrityError:
+        raise HTTPException(status_code=400, detail="Something went wrong")
+ 
 
        
