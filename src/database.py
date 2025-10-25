@@ -6,17 +6,12 @@ from sqlalchemy.ext.declarative import declarative_base
 import ssl
 import os
 
-Database_Url =os.environ.get("DATABASE_URL")
-if not Database_Url:
-    raise ValueError("DATABASE_URL environment variable not set!")
-ssl_context = ssl.create_default_context()
-ssl_context.check_hostname = False 
-ssl_context.verify_mode = ssl.CERT_NONE
-engine = create_async_engine(
-    Database_Url,
-    echo=True,
-    connect_args={"ssl": ssl_context}
+Database_Url =os.getenv(
+    "DATABASE_URL",
+    "postgresql+asyncpg://postgres:9625015@localhost:5432/medicine_tracker"
 )
+
+engine = create_async_engine(Database_Url,echo=True)
 
 sessionLocal = sessionmaker( bind=engine,
                              class_=AsyncSession,

@@ -2,7 +2,7 @@
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.adherence import Adherence
-from src.Adherecnce_logs.adherence_schema import AdherenceLogs,AdherenceLogsResponse
+from src.Schemas.adherence_schema import AdherenceLogs,AdherenceLogsResponse
 from sqlalchemy.exc import IntegrityError
 import numpy as np
 import joblib
@@ -64,7 +64,7 @@ async def adherence_log(db : AsyncSession,adherence : AdherenceLogs,user_id :int
         taken = result.taken or 0
         scheduled = result.scheduled or 1
         if scheduled == 1:
-            past_rate = 0.5  # neutral for new users
+            past_rate = 0.5  
         else:
             past_rate = taken / scheduled
         feature8 = 0

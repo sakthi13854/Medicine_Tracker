@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from src import database
-from src.Adherecnce_logs.adherence_schema import AdherenceLogs,AdherenceLogsResponse
-from src.Adherecnce_logs.adherence_crud import adherence_log
+from src.Schemas.adherence_schema import AdherenceLogs,AdherenceLogsResponse
+from src.crud.adherence_crud import adherence_log
 
 router = APIRouter(prefix="/Adherence", tags=["Adherence"])
 
